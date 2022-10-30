@@ -13,7 +13,7 @@ spr_character = SpriteUpscaling('test.png', 16, 16, 8, 8, 11)
 gameScreen.fill("white")
 
 while True:
-    gameScreen.blit(spr_character.spr[0], (174, 174)) # 화면 그리기
+    gameScreen.blit(spr_character.spr[0], (174, 174)) # 화면 그리기 (스프라이트, 위치)
 
     for event in pygame.event.get():
         if event.type == QUIT:
