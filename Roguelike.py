@@ -7,7 +7,6 @@ screenSize = (1000, 1000) # 창 크기
 gameScreen = pygame.display.set_mode(screenSize)    # 창모드
 pygame.display.set_caption('Roguelike!')    # 게임 이름 표시
 pygame.init()
-print("D")
 
 spr_character = SpriteUpscaling('test.png', 16, 16, 8, 8, 11)
 gameScreen.fill((255, 255, 255))
