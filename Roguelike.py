@@ -39,7 +39,6 @@ arrow_size = (50,50)
 prevy = 0
 prevx = 0
 running = True
-curx,cury = 0,500
 attack = 1
 attack_delay = 0
 respawn_time = 0
@@ -139,28 +138,29 @@ def display_health():
 
 surface = p.display.set_mode((display_wide, display_height))
 
-def set_difficulty(value, difficulty):
-    print(value)
-    print(difficulty)
- 
-def start_the_game():
+def start_the_game(): #play 눌렀을때 생기는 이벤트
     global running
     global health
     global respawn_time
     global attack
     global attack_delay
     global inv
-    global curx
-    global cury
+    global curx, cury
     global inv_delay
+    global monster_list
+    running = True
+    health = 3
+    curx,cury = 0,500
     while running:
         dt = fps.tick(60)
         display.blit(background, (0,0))
         display_health()
     
         if health == 0:
-
+            
             running = False
+            monster_list = []
+            display.blit(character, (curx,cury))
 
         for event in p.event.get():
             if event.type == p.QUIT:
