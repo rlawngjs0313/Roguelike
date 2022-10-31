@@ -36,7 +36,7 @@ half_heart = p.transform.scale(half_heart,(30,30))
 empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
 empty_heart = p.transform.scale(empty_heart,(30,30))
 
-
+print ("D")
 
 prevy = 0
 prevx = 0
