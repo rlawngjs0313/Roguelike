@@ -36,7 +36,7 @@ arrow_size = (50,50)
 prevy = 0
 prevx = 0
 running = True
-curx,cury = 0,500
+curx,cury = 400,400
 attack = 1
 attack_delay = 0
 respawn_time = 0
@@ -64,6 +64,11 @@ class monster:
 
     def attack(self, att):
         self.hp -= att
+
+class slime(monster):
+    def __init__(self):
+        monster.__init__(self)
+
 
 
 class chara:
@@ -106,7 +111,7 @@ health = 3
 inv = 0
 inv_delay = 0
 respawn_delay = 10
-monster_p = monster(10,10,500,500)
+
 
 def display_health():
     if health == 0.5:
