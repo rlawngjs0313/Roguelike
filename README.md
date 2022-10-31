@@ -1,5 +1,5 @@
 ## 파이썬으로 만드는 로그라이크
-1. Pygame 필수 설치 / python -m pip install pygame
+1. Pygame, pygame_menu 필수 설치 / python -m pip install pygame / python -m pip install pygame_menu
 2. 파이썬 버전 3.10.5 64-bit 환경
 ## 필독!!!!!
 1. 코딩 시작 전, 변경 사항 있는 지 확인 (vscode 하단에 새로 고침 버튼 누르기!!)
