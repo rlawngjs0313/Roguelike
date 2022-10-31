@@ -1,4 +1,3 @@
-from os import environ
 import pygame
 from datafile import *
 from pygame.locals import *
@@ -10,7 +9,7 @@ pygame.display.set_caption('Roguelike!')    # 게임 이름 표시
 pygame.init()
 
 spr_character = SpriteUpscaling('test.png', 16, 16, 8, 8, 11)
-gameScreen.fill("white")
+gameScreen.fill((255, 255, 255))
 
 player_x = screenSize[0] / 2
 player_y = screenSize[1] / 2
