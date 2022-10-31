@@ -168,7 +168,8 @@ def start_the_game():
         display_health()
 
         level_display = font.render("level " + str(level), True,(0,0,0))
-        exp_display = font.render("exp " + str(100 * exp / (2 * level ** 2)), True, (0,0,0))
+        exp_display = font.render("exp %.1f" %(100 * exp / (2 * level ** 2)), True, (0,0,0))
+        sp_display = font.render("sp " + str(sp), True, (0,0,0))
 
         if health == 0:
 
@@ -177,6 +178,18 @@ def start_the_game():
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
+            
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_1:
+                    sp -= 1
+                elif event.key == p.K_2:
+                    sp -= 1
+                elif event.key == p.K_3:
+                    sp -= 1
+                    if health >= 2:
+                        health = 3
+                    else:
+                        health += 1
 
     
         player.dirx = 0
@@ -205,6 +218,7 @@ def start_the_game():
             exp -= 2 * level ** 2
             level += 1
             sp += 1
+        
 
         if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
             if player.bow == 1:
@@ -256,8 +270,8 @@ def start_the_game():
                         health -= 0.5
                         inv = 1
 
-
-
+        if sp:
+            display.blit(sp_display,(900,50))
         display.blit(level_display,(900,10))
         display.blit(exp_display,(750,10))
         display.blit(character, (curx,cury))
