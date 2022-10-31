@@ -7,7 +7,6 @@
 ## 코딩 참고!
 1. https://printed.tistory.com/120?category=804472
 2. https://makerejoicegames.tistory.com/93
-## 현재 상황
 # 구현한 기능
 - 움직임
 - 이미지 데이터 불러와서 화면에 표시
