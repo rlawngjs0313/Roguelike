@@ -6,6 +6,8 @@ import random as r
 import os
 
 p.init()
+
+font = p.font.Font(None, 40)
 display_wide = 1024
 display_height = 768
 display = p.display.set_mode((display_wide,display_height))
@@ -43,9 +45,12 @@ curx,cury = 0,500
 attack = 1
 attack_delay = 0
 respawn_time = 0
+exp = 0
+level = 1
 
 arrow_list = []
 monster_list = []
+
 
 class monster:
     x = 0
@@ -62,8 +67,10 @@ class monster:
         display.blit(monster_png, (self.x, self.y))
     
     def remove(self):
+        global exp
         if self.hp <= 0:
             monster_list.remove(self)   
+            exp += 1
 
     def attack(self, att):
         self.hp -= att
@@ -109,7 +116,10 @@ health = 3
 inv = 0
 inv_delay = 0
 respawn_delay = 10
-monster_p = monster(10,10,500,500)
+sp = 0
+
+
+    
 
 def display_health():
     if health == 0.5:
@@ -147,17 +157,19 @@ def start_the_game():
     global running
     global health
     global respawn_time
-    global attack
-    global attack_delay
-    global inv
-    global curx
-    global cury
-    global inv_delay
+    global attack,attack_delay,inv,inv_delay
+    global curx, prevx
+    global cury, prevy
+    global level,exp,sp
+
     while running:
         dt = fps.tick(60)
         display.blit(background, (0,0))
         display_health()
-    
+
+        level_display = font.render("level " + str(level), True,(0,0,0))
+        exp_display = font.render("exp " + str(100 * exp / (2 * level ** 2)), True, (0,0,0))
+
         if health == 0:
 
             running = False
@@ -188,6 +200,11 @@ def start_the_game():
             cury += player.speed
             player.diry = 1
             prevy = 1
+
+        if exp >= 2 * level ** 2:
+            exp -= 2 * level ** 2
+            level += 1
+            sp += 1
 
         if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
             if player.bow == 1:
@@ -241,13 +258,13 @@ def start_the_game():
 
 
 
-    
+        display.blit(level_display,(900,10))
+        display.blit(exp_display,(750,10))
         display.blit(character, (curx,cury))
     
         p.display.update()
  
-def level_menu():
-    mainmenu._open(level)
+
  
  
 mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=themes.THEME_SOLARIZED)
