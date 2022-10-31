@@ -11,6 +11,7 @@ p.display.set_caption("Roguelike")
 
 DIR_PATH = os.path.dirname(__file__)
 DIR_IMAGE = os.path.join(DIR_PATH, 'src')
+print("D")
 
 character_size = (80,108)
 monster_size = (80,108)
