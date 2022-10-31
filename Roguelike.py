@@ -1,4 +1,7 @@
+from time import sleep  
 import pygame as p
+import pygame_menu
+from pygame_menu import themes
 import random as r
 import os
 
@@ -134,99 +137,125 @@ def display_health():
         display.blit(heart,(35,5))
         display.blit(heart,(65,5))
 
+surface = p.display.set_mode((display_wide, display_height))
 
-while running:
-    dt = fps.tick(60)
-    display.blit(background, (0,0))
-    display_health()
+def set_difficulty(value, difficulty):
+    print(value)
+    print(difficulty)
+ 
+def start_the_game():
+    global running
+    global health
+    global respawn_time
+    global attack
+    global attack_delay
+    global inv
+    global curx
+    global cury
+    global inv_delay
+    while running:
+        dt = fps.tick(60)
+        display.blit(background, (0,0))
+        display_health()
     
-    if health == 0:
-        running = False
+        if health == 0:
 
-    for event in p.event.get():
-        if event.type == p.QUIT:
             running = False
 
-    
-    player.dirx = 0
-    player.diry = 0
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                running = False
 
-    key = p.key.get_pressed()
     
-    if key[p.K_LEFT]:
-        curx -= player.speed
-        player.dirx = -1
-        prevx = -1
-    if key[p.K_RIGHT]:
-        curx += player.speed
-        player.dirx = 1
-        prevx = -1
-    if key[p.K_UP]:
-        cury -= player.speed
-        player.diry = -1
-        prevy = -1
-    if key[p.K_DOWN]:
-        cury += player.speed
-        player.diry = 1
-        prevy = 1
+        player.dirx = 0
+        player.diry = 0
 
-    if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
-        if player.bow == 1:
-            attack = 0
-            delay = player.attack_speed
-            arrow_p = arrow(curx,cury)
-            arrow_list.append(arrow_p)
+        key = p.key.get_pressed()
     
-    respawn_time += 0.1
-    if respawn_time >= respawn_delay:
-        respawn_time = 0
-        spawnx = r.sample(range(1,display_wide - 50),1)
-        spawny = r.sample(range(1,display_height - 50),1)
-        monster_p = monster(10,10,spawnx[0],spawny[0])
+        if key[p.K_LEFT]:
+            curx -= player.speed
+            player.dirx = -1
+            prevx = -1
+        if key[p.K_RIGHT]:
+            curx += player.speed
+            player.dirx = 1
+            prevx = -1
+        if key[p.K_UP]:
+            cury -= player.speed
+            player.diry = -1
+            prevy = -1
+        if key[p.K_DOWN]:
+            cury += player.speed
+            player.diry = 1
+            prevy = 1
+
+        if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
+            if player.bow == 1:
+                attack = 0
+                delay = player.attack_speed
+                arrow_p = arrow(curx,cury)
+                arrow_list.append(arrow_p)
+    
+        respawn_time += 0.1
+        if respawn_time >= respawn_delay:
+            respawn_time = 0
+            spawnx = r.sample(range(1,display_wide - 50),1)
+            spawny = r.sample(range(1,display_height - 50),1)
+            monster_p = monster(10,10,spawnx[0],spawny[0])
         
 
-    if attack == 0:
-        attack_delay += 0.5
+        if attack == 0:
+            attack_delay += 0.5
 
-    if attack_delay >= player.attack_speed:
-        attack = 1
-        attack_delay = 0
+        if attack_delay >= player.attack_speed:
+            attack = 1
+            attack_delay = 0
     
-    if player.bow == 1:
-        for i in arrow_list:
-            i.move()
+        if player.bow == 1:
+            for i in arrow_list:
+                i.move()
+                i.draw()
+                i.remove()
+                for j in monster_list:
+                    if 0 <= i.x - j.x <= monster_size[0] or 0 <= j.x - i.x <= arrow_size[0]:
+                        if 0 <= i.y - j.y <= monster_size[1] or 0 <= j.y - i.y <= arrow_size[1]:
+                            i.delete()
+                            j.attack(player.dmg)
+                            break
+    
+        if inv == 1:
+            inv_delay += 0.1
+
+        if inv == 1 and inv_delay >= 4:
+            inv = 0
+            inv_delay = 0
+
+        for i in monster_list:
             i.draw()
             i.remove()
-            for j in monster_list:
-                if 0 <= i.x - j.x <= monster_size[0] or 0 <= j.x - i.x <= arrow_size[0]:
-                    if 0 <= i.y - j.y <= monster_size[1] or 0 <= j.y - i.y <= arrow_size[1]:
-                        i.delete()
-                        j.attack(player.dmg)
-                        break
-    
-    if inv == 1:
-        inv_delay += 0.1
-
-    if inv == 1 and inv_delay >= 4:
-        inv = 0
-        inv_delay = 0
-
-    for i in monster_list:
-        i.draw()
-        i.remove()
-        if 0 <= curx - i.x <= character_size[0] or 0 <= i.x - curx <= character_size[0]:
-            if 0 <= cury - i.y <= character_size[1] or 0 <= i.y - cury <= character_size[1]:  
-                if inv == 0:  
-                    health -= 0.5
-                    inv = 1
+            if 0 <= curx - i.x <= character_size[0] or 0 <= i.x - curx <= character_size[0]:
+                if 0 <= cury - i.y <= character_size[1] or 0 <= i.y - cury <= character_size[1]:  
+                    if inv == 0:  
+                        health -= 0.5
+                        inv = 1
 
 
 
     
-    display.blit(character, (curx,cury))
+        display.blit(character, (curx,cury))
     
-    p.display.update()
-
+        p.display.update()
+ 
+def level_menu():
+    mainmenu._open(level)
+ 
+ 
+mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=themes.THEME_SOLARIZED)
+mainmenu.add.button('Play', start_the_game)
+mainmenu.add.button('Quit', pygame_menu.events.EXIT)
+ 
+ 
+mainmenu.mainloop(surface)
 
 
 p.quit()
