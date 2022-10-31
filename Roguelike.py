@@ -11,6 +11,7 @@ p.display.set_caption("Roguelike")
 
 DIR_PATH = os.path.dirname(__file__)
 DIR_IMAGE = os.path.join(DIR_PATH, 'src')
+print("D")
 
 
 background = p.image.load(os.path.join(DIR_IMAGE, "background.png"))
