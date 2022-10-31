@@ -13,38 +13,49 @@ DIR_PATH = os.path.dirname(__file__)
 DIR_IMAGE = os.path.join(DIR_PATH, 'src')
 print("D")
 
-
-background = p.image.load(os.path.join(DIR_IMAGE, "background.png"))
-character = p.image.load(os.path.join(DIR_IMAGE, "character.png"))
-character = p.transform.scale(character,(80,108))
-monster_png = p.image.load(os.path.join(DIR_IMAGE, "monster.jpeg"))
-monster_png = p.transform.scale(monster_png,(80,108))
-arrow_png = p.image.load(os.path.join(DIR_IMAGE, "arrow.png"))
-arrow_png = p.transform.scale(arrow_png,(50,50))
-heart = p.image.load(os.path.join(DIR_IMAGE, "heart.png"))
-heart = p.transform.scale(heart,(30,30))
-half_heart = p.image.load(os.path.join(DIR_IMAGE, "half_heart.png"))
-half_heart = p.transform.scale(half_heart,(30,30))
-empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
-empty_heart = p.transform.scale(empty_heart,(30,30))
-
-
 character_size = (80,108)
 monster_size = (80,108)
 arrow_size = (50,50)
+
+background = p.image.load(os.path.join(DIR_IMAGE, "background.png"))
+character = p.image.load(os.path.join(DIR_IMAGE, "character.png"))
+character = p.transform.scale(character,character_size)
+
+monster_png = p.image.load(os.path.join(DIR_IMAGE, "monster.jpeg"))
+monster_png = p.transform.scale(monster_png,monster_size)
+
+arrow_png = p.image.load(os.path.join(DIR_IMAGE, "arrow.png"))
+arrow_png = p.transform.scale(arrow_png,arrow_size)
+
+heart = p.image.load(os.path.join(DIR_IMAGE, "heart.png"))
+heart = p.transform.scale(heart,(30,30))
+
+half_heart = p.image.load(os.path.join(DIR_IMAGE, "half_heart.png"))
+half_heart = p.transform.scale(half_heart,(30,30))
+
+empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
+empty_heart = p.transform.scale(empty_heart,(30,30))
+
 
 
 prevy = 0
 prevx = 0
 running = True
-curx,cury = 0,500
+curx,cury = 500,300
 attack = 1
 attack_delay = 0
 respawn_time = 0
+exp = 0
+level = 1
 
 arrow_list = []
 monster_list = []
 
+
+def expr(num):
+    if 3 * level ** 3 <= exp:
+        level += 1
+        exp -= 3 * level ** 3
 class monster:
     x = 0
     y = 0
@@ -61,10 +72,15 @@ class monster:
     
     def remove(self):
         if self.hp <= 0:
-            monster_list.remove(self)   
-
+            monster_list.remove(self)  
+            
     def attack(self, att):
         self.hp -= att
+
+class slime(monster):
+    def __init__(self):
+        monster.__init__(self)
+
 
 
 class chara:
@@ -78,28 +94,31 @@ class chara:
     dirx = 0
     diry = 0
 
-class arrow:
+class weapon:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.dirx = player.dirx
         self.diry = player.diry
-    
-    def remove(self):
-        if(self.x >= display_wide + 50 or self.x <= -50):
-            arrow_list.remove(self)
+
+class arrow(weapon):
+    def __init__(self,x,y):
+       weapon.__init__(self,x,y)
 
     def draw(self):
         if self.dirx != 0 or self.diry != 0:
             display.blit(arrow_png ,(self.x,self.y))
-       
+
+    def remove(self):
+        if(self.x >= display_wide + 50 or self.x <= -50):
+            arrow_list.remove(self)
+
     def move(self):
         self.x += self.dirx * 10
         self.y += self.diry * 10
-    
+
     def delete(self):
         arrow_list.remove(self)
-        
 
 player = chara(3,10,10,5)
 player.bow = 1
@@ -107,7 +126,7 @@ health = 3
 inv = 0
 inv_delay = 0
 respawn_delay = 10
-monster_p = monster(10,10,500,500)
+
 
 def display_health():
     if health == 0.5:
@@ -222,8 +241,6 @@ while running:
                     inv = 1
 
 
-
-    
     display.blit(character, (curx,cury))
     
     p.display.update()
