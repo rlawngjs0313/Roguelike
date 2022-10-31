@@ -110,12 +110,12 @@ class arrow:
         arrow_list.remove(self)
         
 
-player = chara(3,10,10,5)
+player = chara(3,5,75,5)
 player.bow = 1
 health = 3
 inv = 0
 inv_delay = 0
-respawn_delay = 10
+respawn_delay = 180
 sp = 0
 
 
@@ -149,9 +149,6 @@ def display_health():
 
 surface = p.display.set_mode((display_wide, display_height))
 
-def set_difficulty(value, difficulty):
-    print(value)
-    print(difficulty)
  
 def start_the_game():
     global running
@@ -168,8 +165,10 @@ def start_the_game():
         display_health()
 
         level_display = font.render("level " + str(level), True,(0,0,0))
-        exp_display = font.render("exp %.1f" %(100 * exp / (2 * level ** 2)), True, (0,0,0))
+        exp_display = font.render("exp %.2f" %(100 * exp / (2 * level ** 2)), True, (0,0,0))
         sp_display = font.render("sp " + str(sp), True, (0,0,0))
+        dmg_display = font.render("dmg " + str(player.dmg), True, (0,0,0))
+        as_display = font.render("as %.2f" %(60 / player.attack_speed), True, (0,0,0))
 
         if health == 0:
 
@@ -182,8 +181,10 @@ def start_the_game():
             if event.type == p.KEYDOWN:
                 if event.key == p.K_1:
                     sp -= 1
+                    player.dmg += 3
                 elif event.key == p.K_2:
                     sp -= 1
+                    player.attack_speed *= 0.9
                 elif event.key == p.K_3:
                     sp -= 1
                     if health >= 2:
@@ -227,7 +228,7 @@ def start_the_game():
                 arrow_p = arrow(curx,cury)
                 arrow_list.append(arrow_p)
     
-        respawn_time += 0.1
+        respawn_time += 1
         if respawn_time >= respawn_delay:
             respawn_time = 0
             spawnx = r.sample(range(1,display_wide - 50),1)
@@ -236,7 +237,7 @@ def start_the_game():
         
 
         if attack == 0:
-            attack_delay += 0.5
+            attack_delay += 1
 
         if attack_delay >= player.attack_speed:
             attack = 1
@@ -270,11 +271,13 @@ def start_the_game():
                         health -= 0.5
                         inv = 1
 
+        display.blit(character, (curx,cury))
         if sp:
             display.blit(sp_display,(900,50))
         display.blit(level_display,(900,10))
         display.blit(exp_display,(750,10))
-        display.blit(character, (curx,cury))
+        display.blit(dmg_display,(750,680))
+        display.blit(as_display,(900,680))
     
         p.display.update()
  
