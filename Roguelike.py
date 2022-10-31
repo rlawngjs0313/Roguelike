@@ -21,7 +21,7 @@ DIR_IMAGE = os.path.join(DIR_PATH, 'src')
 background = p.image.load(os.path.join(DIR_IMAGE, "background.png"))
 character = p.image.load(os.path.join(DIR_IMAGE, "character.png"))
 character = p.transform.scale(character,(80,108))
-monster_png = p.image.load(os.path.join(DIR_IMAGE, "monster.png"))
+monster_png = p.image.load(os.path.join(DIR_IMAGE, "monster.jpeg"))
 monster_png = p.transform.scale(monster_png,(80,108))
 arrow_png = p.image.load(os.path.join(DIR_IMAGE, "arrow.png"))
 arrow_png = p.transform.scale(arrow_png,(50,50))
@@ -41,6 +41,7 @@ arrow_size = (50,50)
 prevy = 0
 prevx = 0
 running = True
+curx,cury = 300,500
 attack = 1
 attack_delay = 0
 respawn_time = 0
@@ -148,7 +149,7 @@ def display_health():
 
 surface = p.display.set_mode((display_wide, display_height))
 
-
+ 
 def start_the_game():
     global running
     global health
@@ -157,6 +158,7 @@ def start_the_game():
     global curx, prevx
     global cury, prevy
     global level,exp,sp
+
     while running:
         dt = fps.tick(60)
         display.blit(background, (0,0))
@@ -169,10 +171,8 @@ def start_the_game():
         as_display = font.render("as %.2f" %(60 / player.attack_speed), True, (0,0,0))
 
         if health == 0:
-            
+
             running = False
-            monster_list = []
-            display.blit(character, (curx,cury))
 
         for event in p.event.get():
             if event.type == p.QUIT:
