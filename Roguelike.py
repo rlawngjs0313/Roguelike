@@ -145,7 +145,7 @@ def start_the_game(): #play 눌렀을때 생기는 이벤트
     global attack
     global attack_delay
     global inv
-    global curx, curysd
+    global curx, cury
     global inv_delay
     global monster_list
     running = True
