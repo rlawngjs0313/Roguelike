@@ -11,7 +11,6 @@ p.display.set_caption("Roguelike")
 
 DIR_PATH = os.path.dirname(__file__)
 DIR_IMAGE = os.path.join(DIR_PATH, 'src')
-print("D")
 
 character_size = (80,108)
 monster_size = (80,108)
@@ -35,8 +34,6 @@ half_heart = p.transform.scale(half_heart,(30,30))
 
 empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
 empty_heart = p.transform.scale(empty_heart,(30,30))
-
-print ("D")
 
 prevy = 0
 prevx = 0
