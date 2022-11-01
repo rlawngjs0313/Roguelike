@@ -1,37 +1,20 @@
-from time import sleep  
-import pygame as p
-import pygame_menu
+import pygame as p, pygame_menu
 from pygame_menu import themes
 import random as r
-import os
+import datafile
+
+file = datafile.file()
 
 p.init()
-
+t = 0
 font = p.font.Font(None, 40)
 display_wide = 1024
 display_height = 768
 display = p.display.set_mode((display_wide,display_height))
 fps = p.time.Clock()
-t = 0
 p.display.set_caption("Roguelike")
+mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=themes.THEME_SOLARIZED)
 
-DIR_PATH = os.path.dirname(__file__)
-DIR_IMAGE = os.path.join(DIR_PATH, 'src')
-
-
-background = p.image.load(os.path.join(DIR_IMAGE, "background.png"))
-character = p.image.load(os.path.join(DIR_IMAGE, "character.png"))
-character = p.transform.scale(character,(80,108))
-monster_png = p.image.load(os.path.join(DIR_IMAGE, "monster.png"))
-monster_png = p.transform.scale(monster_png,(80,108))
-arrow_png = p.image.load(os.path.join(DIR_IMAGE, "arrow.png"))
-arrow_png = p.transform.scale(arrow_png,(50,50))
-heart = p.image.load(os.path.join(DIR_IMAGE, "heart.png"))
-heart = p.transform.scale(heart,(30,30))
-half_heart = p.image.load(os.path.join(DIR_IMAGE, "half_heart.png"))
-half_heart = p.transform.scale(half_heart,(30,30))
-empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
-empty_heart = p.transform.scale(empty_heart,(30,30))
 
 class entity:
     def __init__(self,hp,x,y,speed):
@@ -72,10 +55,7 @@ class zombie(monster):
         self.size = (80,108)
 
     def draw(self):
-        display.blit(monster_png, (self.x, self.y))
-
-    
-
+        display.blit(file.monster_png, (self.x, self.y))
 
 class chara(entity):
     def __init__(self, hp, x, y,speed,dmg,attack_speed):
@@ -103,7 +83,7 @@ class arrow:
 
     def draw(self):
         if self.dirx != 0 or self.diry != 0:
-            display.blit(arrow_png ,(self.x,self.y))
+            display.blit(file.arrow_png ,(self.x,self.y))
        
     def move(self):
         self.x += self.dirx * 10
@@ -119,12 +99,21 @@ def rect(x,y):
     
     return False
 
+def pausing():
+    global pause, elapsed,t ,start_time
+    if pause:
+        t = elapsed
+    while pause:
+        for event in p.event.get():
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_ESCAPE:
+                    pause = 0
+                    start_time = p.time.get_ticks()
+        p.display.update()
+
 def init():
-    global arrow_png
-    global running
-    global health
-    global respawn_time
-    global attack,attack_delay,inv,inv_delay
+    global running, health, respawn_time, pause
+    global attack,attack_delay,inv,inv_delay, t
     global level,exp,sp, arrow_list, monster_list
     global respawn_delay, start, projectile_size, player
     
@@ -143,57 +132,53 @@ def init():
     sp = 0
     start = 0
     projectile_size = 50
+    pause = 0
+    t = 0
     player = chara(3,500,300,5,5,75)
     player.bow = 1
-
-
+    
 def display_health():
     if health == 0.5:
-        display.blit(half_heart,(5,5))
-        display.blit(empty_heart,(35,5))
-        display.blit(empty_heart,(65,5))
+        display.blit(file.half_heart,(5,5))
+        display.blit(file.empty_heart,(35,5))
+        display.blit(file.empty_heart,(65,5))
     elif health == 1:
-        display.blit(heart,(5,5))
-        display.blit(empty_heart,(35,5))
-        display.blit(empty_heart,(65,5))
+        display.blit(file.heart,(5,5))
+        display.blit(file.empty_heart,(35,5))
+        display.blit(file.empty_heart,(65,5))
     elif health == 1.5:
-        display.blit(heart,(5,5))
-        display.blit(half_heart,(35,5))
-        display.blit(empty_heart,(65,5))
+        display.blit(file.heart,(5,5))
+        display.blit(file.half_heart,(35,5))
+        display.blit(file.empty_heart,(65,5))
     elif health == 2:
-        display.blit(heart,(5,5))
-        display.blit(heart,(35,5))
-        display.blit(empty_heart,(65,5))
+        display.blit(file.heart,(5,5))
+        display.blit(file.heart,(35,5))
+        display.blit(file.empty_heart,(65,5))
     elif health == 2.5:
-        display.blit(heart,(5,5))
-        display.blit(heart,(35,5))
-        display.blit(half_heart,(65,5))
+        display.blit(file.heart,(5,5))
+        display.blit(file.heart,(35,5))
+        display.blit(file.half_heart,(65,5))
     elif health == 3:
-        display.blit(heart,(5,5))
-        display.blit(heart,(35,5))
-        display.blit(heart,(65,5))
+        display.blit(file.heart,(5,5))
+        display.blit(file.heart,(35,5))
+        display.blit(file.heart,(65,5))
 
-surface = p.display.set_mode((display_wide, display_height))
-
- 
 def start_the_game():
-    global arrow_png
-    global running
-    global health
-    global respawn_time
-    global attack,attack_delay,inv,inv_delay
-    global level,exp,sp,start,projectile_size,player
+    global running, health, respawn_time, t, pause
+    global attack,attack_delay,inv,inv_delay, elapsed
+    global level,exp,sp,start,projectile_size,player, start_time
 
     init()
     
     while running :
+        pausing()
         if start == 0:
             start_time = p.time.get_ticks()
         start = 1
 
-        elapsed = int((p.time.get_ticks() - start_time) / 1000)
+        elapsed = int((p.time.get_ticks() - start_time) / 1000) + t
         dt = fps.tick(60)
-        display.blit(background, (0,0))
+        display.blit(file.background, (0, 0))
         display_health()
 
         time_display = font.render("%02d : %02d" %(int(elapsed / 60),elapsed % 60), True, (0,0,0))
@@ -222,13 +207,19 @@ def start_the_game():
                 elif event.key == p.K_3:
                     sp -= 1
                     projectile_size *= 1.2
-                    arrow_png = p.transform.scale(arrow_png,(projectile_size,projectile_size))
+                    arrow_png = p.transform.scale(file.arrow_png,(projectile_size,projectile_size))
                 elif event.key == p.K_4:
                     sp -= 1
                     if health >= 2:
                         health = 3
                     else:
                         health += 1
+
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_ESCAPE and pause == 0:
+                    pause = 1
+                elif event.key == p.K_ESCAPE and pause == 1:
+                    pause = 0
 
     
         player.dirx = 0
@@ -249,7 +240,7 @@ def start_the_game():
             player.y += player.speed
             player.diry = 1
         if key[p.K_F5]: #f5 누르면 재시작
-            mainmenu.mainloop(surface)
+            mainmenu.mainloop(display)
 
         if exp >= 2 * level ** 2:
             exp -= 2 * level ** 2
@@ -310,7 +301,7 @@ def start_the_game():
                     health -= 0.5
                     inv = 1
 
-        display.blit(character, (player.x,player.y))
+        display.blit(file.character, (player.x,player.y))
         if sp:
             display.blit(sp_display,(900,50))
         display.blit(time_display,(490,10))
@@ -321,16 +312,7 @@ def start_the_game():
         display.blit(as_display,(900,720))
     
         p.display.update()
- 
 
- 
- 
-mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=themes.THEME_SOLARIZED)
 mainmenu.add.button('Play', start_the_game)
 mainmenu.add.button('Quit', pygame_menu.events.EXIT)
- 
- 
-mainmenu.mainloop(surface)
-
-
-p.quit()
+mainmenu.mainloop(display)
