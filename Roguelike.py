@@ -118,7 +118,7 @@ def rect(x,y):
     
     return False
 
-def stop():
+def pausing():
     global pause, elapsed,t ,start_time
     if pause:
         t = elapsed
@@ -202,7 +202,7 @@ def start_the_game():
     init()
     
     while running:
-        stop()
+        pausing()
         if start == 0:
             start_time = p.time.get_ticks()
         start = 1
