@@ -32,19 +32,16 @@ half_heart = p.transform.scale(half_heart,(30,30))
 empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
 empty_heart = p.transform.scale(empty_heart,(30,30))
 
-
-character_size = (80,108)
-monster_size = (80,108)
-
-
-class monster:
-    x = 0
-    y = 0
-    def __init__(self, hp, x, y, speed, expr):
+class entity:
+    def __init__(self,hp,x,y,speed):
         self.x = x
         self.y = y
         self.hp = hp
         self.speed = speed
+
+class monster(entity):
+    def __init__(self, hp, x, y, speed, expr):
+        entity.__init__(self,hp,x,y,speed)
         self.expr = expr
         monster_list.append(self)
     
@@ -58,31 +55,30 @@ class monster:
         self.hp -= att
     
     def move(self):
-        if self.x > curx:
+        if self.x > player.x:
             self.x -= self.speed
-        elif self.x < curx:
+        elif self.x < player.x:
             self.x += self.speed
         
-        if self.y > cury:
+        if self.y > player.y:
             self.y -= self.speed
-        elif self.y < cury:
+        elif self.y < player.y:
             self.y += self.speed
 
 class zombie(monster):
     def __init__(self,hp,x,y,speed,expr):
         monster.__init__(self,hp,x,y,speed,expr)
+        self.size = (80,108)
 
     def draw(self):
         display.blit(monster_png, (self.x, self.y))
-class slime(monster):
-    def __init__(self,hp,x,y,speed,expr):
-        monster.__init__(self,hp,x,y,speed,expr)
+
     
 
 
-class chara:
-    def __init__(self, hp, dmg, attack_speed, speed):
-        self.hp = hp
+class chara(entity):
+    def __init__(self, hp, x, y,speed,dmg,attack_speed):
+        entity.__init__(self,hp,x,y,speed)
         self.dmg = dmg
         self.attack_speed = attack_speed
         self.speed = speed
@@ -90,6 +86,7 @@ class chara:
     sword = 0
     dirx = 0
     diry = 0
+    size = (80, 108)
 
 class arrow:
     def __init__(self, x, y):
@@ -97,6 +94,7 @@ class arrow:
         self.y = y
         self.dirx = player.dirx
         self.diry = player.diry
+        self.size = (50, 50)
     
     def remove(self):
         if(self.x >= display_wide + 50 or self.x <= -50):
@@ -113,6 +111,13 @@ class arrow:
     def delete(self):
         arrow_list.remove(self)
 
+def rect(x,y):
+    if 0 <= x.x - y.x <= x.size[0] or 0 <= y.x - x.x <= y.size[0]:
+        if 0 <= x.y - y.y <= x.size[1] or 0 <= y.y - x.y <= y.size[1]:
+            return True
+    
+    return False
+
 
 def init():
     global arrow_png
@@ -120,13 +125,11 @@ def init():
     global health
     global respawn_time
     global attack,attack_delay,inv,inv_delay
-    global curx, cury
     global level,exp,sp
     global arrow_list, monster_list
     global respawn_delay, start, projectile_size, player
-
+    
     running = True
-    curx,cury = 300,500
     attack = 1
     attack_delay = 0
     respawn_time = 0
@@ -141,7 +144,7 @@ def init():
     sp = 0
     start = 0
     projectile_size = 50
-    player = chara(3,5,75,5)
+    player = chara(3,500,300,5,5,75)
     player.bow = 1
     
 
@@ -180,7 +183,6 @@ def start_the_game():
     global health
     global respawn_time
     global attack,attack_delay,inv,inv_delay
-    global curx, cury
     global level,exp,sp,start,projectile_size,player
 
     init()
@@ -204,7 +206,6 @@ def start_the_game():
         as_display = font.render("as %.2f" %(60 / player.attack_speed), True, (0,0,0))
 
         if health == 0:
-
             running = False
 
         for event in p.event.get():
@@ -237,16 +238,16 @@ def start_the_game():
         key = p.key.get_pressed()
     
         if key[p.K_LEFT]:
-            curx -= player.speed
+            player.x -= player.speed
             player.dirx = -1
         if key[p.K_RIGHT]:
-            curx += player.speed
+            player.x += player.speed
             player.dirx = 1
         if key[p.K_UP]:
-            cury -= player.speed
+            player.y -= player.speed
             player.diry = -1
         if key[p.K_DOWN]:
-            cury += player.speed
+            player.y += player.speed
             player.diry = 1
         if key[p.K_F5]: #f5 누르면 재시작
             mainmenu.mainloop(surface)
@@ -261,16 +262,16 @@ def start_the_game():
             if player.bow == 1:
                 attack = 0
                 delay = player.attack_speed
-                arrow_p = arrow(curx,cury)
+                arrow_p = arrow(player.x,player.y)
                 arrow_list.append(arrow_p)
     
         respawn_time += 1
         if respawn_time >= respawn_delay:
             respawn_time = 0
-            minusx = list(range(curx - 600, curx - 500))
-            minusy = list(range(cury - 500, cury - 400))
-            plusx = list(range(curx + 500, curx + 600))
-            plusy = list(range(cury + 500, cury + 600))
+            minusx = list(range(player.x - 600, player.x - 500))
+            minusy = list(range(player.y - 500, player.y - 400))
+            plusx = list(range(player.x + 500, player.x + 600))
+            plusy = list(range(player.y + 500, player.y + 600))
             spawnx = r.sample(minusx + plusx,1)
             spawny = r.sample(minusy + plusy,1)
             zombie_p = zombie(10,spawnx[0],spawny[0],1,2)
@@ -289,11 +290,10 @@ def start_the_game():
                 i.draw()
                 i.remove()
                 for j in monster_list:
-                    if 0 <= i.x - j.x <= monster_size[0] or 0 <= j.x - i.x <= projectile_size:
-                        if 0 <= i.y - j.y <= monster_size[1] or 0 <= j.y - i.y <= projectile_size:
-                            i.delete()
-                            j.attack(player.dmg)
-                            break
+                    if rect(i,j):
+                        i.delete()
+                        j.attack(player.dmg)
+                        break
     
         if inv == 1:
             inv_delay += 0.1
@@ -306,13 +306,12 @@ def start_the_game():
             i.draw()
             i.remove()
             i.move()
-            if 0 <= curx - i.x <= character_size[0] or 0 <= i.x - curx <= character_size[0]:
-                if 0 <= cury - i.y <= character_size[1] or 0 <= i.y - cury <= character_size[1]:  
-                    if inv == 0:  
-                        health -= 0.5
-                        inv = 1
+            if rect(player, i):
+                if inv == 0:  
+                    health -= 0.5
+                    inv = 1
 
-        display.blit(character, (curx,cury))
+        display.blit(character, (player.x,player.y))
         if sp:
             display.blit(sp_display,(900,50))
         display.blit(time_display,(490,10))
