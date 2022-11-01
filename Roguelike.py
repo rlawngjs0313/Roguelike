@@ -175,11 +175,12 @@ def start_the_game():
     global attack,attack_delay,inv,inv_delay
     global curx, cury
     global level,exp,sp
-    
+    running = True #죽었다가 다시 플레이하혀면 필수
+    health = 3 #죽었다가 다시 플레이하혀면 필수
     start = 0
     projectile_size = 50
 
-    while running:
+    while running :
         if start == 0:
             start_time = p.time.get_ticks()
         start = 1
@@ -205,6 +206,7 @@ def start_the_game():
             if event.type == p.QUIT:
                 running = False
             
+
             if event.type == p.KEYDOWN and sp >= 1:
                 if event.key == p.K_1:
                     sp -= 1
@@ -241,6 +243,8 @@ def start_the_game():
         if key[p.K_DOWN]:
             cury += player.speed
             player.diry = 1
+        if key[p.K_F5]: #f5 누르면 재시작
+            mainmenu.mainloop(surface)
 
         if exp >= 2 * level ** 2:
             exp -= 2 * level ** 2
