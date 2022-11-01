@@ -35,11 +35,9 @@ empty_heart = p.transform.scale(empty_heart,(30,30))
 
 character_size = (80,108)
 monster_size = (80,108)
-arrow_size = (50,50)
 
 
-prevy = 0
-prevx = 0
+
 running = True
 curx,cury = 300,500
 attack = 1
@@ -55,25 +53,44 @@ monster_list = []
 class monster:
     x = 0
     y = 0
-    def __init__(self, hp, dmg, x, y):
+    def __init__(self, hp, x, y, speed, expr):
         self.x = x
         self.y = y
         self.hp = hp
-        self.dmg = dmg
-        self.full = hp
+        self.speed = speed
+        self.expr = expr
         monster_list.append(self)
-    
-    def draw(self):
-        display.blit(monster_png, (self.x, self.y))
     
     def remove(self):
         global exp
         if self.hp <= 0:
             monster_list.remove(self)   
-            exp += 1
+            exp += self.expr
 
     def attack(self, att):
         self.hp -= att
+    
+    def move(self):
+        if self.x > curx:
+            self.x -= self.speed
+        elif self.x < curx:
+            self.x += self.speed
+        
+        if self.y > cury:
+            self.y -= self.speed
+        elif self.y < cury:
+            self.y += self.speed
+
+class zombie(monster):
+    def __init__(self,hp,x,y,speed,expr):
+        monster.__init__(self,hp,x,y,speed,expr)
+
+    def draw(self):
+        display.blit(monster_png, (self.x, self.y))
+class slime(monster):
+    def __init__(self,hp,x,y,speed,expr):
+        monster.__init__(self,hp,x,y,speed,expr)
+    
 
 
 class chara:
@@ -151,22 +168,32 @@ surface = p.display.set_mode((display_wide, display_height))
 
  
 def start_the_game():
+    global arrow_png
     global running
     global health
     global respawn_time
     global attack,attack_delay,inv,inv_delay
-    global curx, prevx
-    global cury, prevy
+    global curx, cury
     global level,exp,sp
+    
+    start = 0
+    projectile_size = 50
 
     while running:
+        if start == 0:
+            start_time = p.time.get_ticks()
+        start = 1
+
+        elapsed = int((p.time.get_ticks() - start_time) / 1000)
         dt = fps.tick(60)
         display.blit(background, (0,0))
         display_health()
 
+        time_display = font.render("%02d : %02d" %(int(elapsed / 60),elapsed % 60), True, (0,0,0))
         level_display = font.render("level " + str(level), True,(0,0,0))
         exp_display = font.render("exp %.2f" %(100 * exp / (2 * level ** 2)), True, (0,0,0))
         sp_display = font.render("sp " + str(sp), True, (0,0,0))
+        size_display = font.render("size %d" %projectile_size, True, (0,0,0))
         dmg_display = font.render("dmg " + str(player.dmg), True, (0,0,0))
         as_display = font.render("as %.2f" %(60 / player.attack_speed), True, (0,0,0))
 
@@ -178,7 +205,7 @@ def start_the_game():
             if event.type == p.QUIT:
                 running = False
             
-            if event.type == p.KEYDOWN:
+            if event.type == p.KEYDOWN and sp >= 1:
                 if event.key == p.K_1:
                     sp -= 1
                     player.dmg += 3
@@ -186,6 +213,10 @@ def start_the_game():
                     sp -= 1
                     player.attack_speed *= 0.9
                 elif event.key == p.K_3:
+                    sp -= 1
+                    projectile_size *= 1.2
+                    arrow_png = p.transform.scale(arrow_png,(projectile_size,projectile_size))
+                elif event.key == p.K_4:
                     sp -= 1
                     if health >= 2:
                         health = 3
@@ -201,19 +232,15 @@ def start_the_game():
         if key[p.K_LEFT]:
             curx -= player.speed
             player.dirx = -1
-            prevx = -1
         if key[p.K_RIGHT]:
             curx += player.speed
             player.dirx = 1
-            prevx = -1
         if key[p.K_UP]:
             cury -= player.speed
             player.diry = -1
-            prevy = -1
         if key[p.K_DOWN]:
             cury += player.speed
             player.diry = 1
-            prevy = 1
 
         if exp >= 2 * level ** 2:
             exp -= 2 * level ** 2
@@ -231,9 +258,13 @@ def start_the_game():
         respawn_time += 1
         if respawn_time >= respawn_delay:
             respawn_time = 0
-            spawnx = r.sample(range(1,display_wide - 50),1)
-            spawny = r.sample(range(1,display_height - 50),1)
-            monster_p = monster(10,10,spawnx[0],spawny[0])
+            minusx = list(range(curx - 600, curx - 500))
+            minusy = list(range(cury - 500, cury - 400))
+            plusx = list(range(curx + 500, curx + 600))
+            plusy = list(range(cury + 500, cury + 600))
+            spawnx = r.sample(minusx + plusx,1)
+            spawny = r.sample(minusy + plusy,1)
+            zombie_p = zombie(10,spawnx[0],spawny[0],1,2)
         
 
         if attack == 0:
@@ -249,8 +280,8 @@ def start_the_game():
                 i.draw()
                 i.remove()
                 for j in monster_list:
-                    if 0 <= i.x - j.x <= monster_size[0] or 0 <= j.x - i.x <= arrow_size[0]:
-                        if 0 <= i.y - j.y <= monster_size[1] or 0 <= j.y - i.y <= arrow_size[1]:
+                    if 0 <= i.x - j.x <= monster_size[0] or 0 <= j.x - i.x <= projectile_size:
+                        if 0 <= i.y - j.y <= monster_size[1] or 0 <= j.y - i.y <= projectile_size:
                             i.delete()
                             j.attack(player.dmg)
                             break
@@ -265,6 +296,7 @@ def start_the_game():
         for i in monster_list:
             i.draw()
             i.remove()
+            i.move()
             if 0 <= curx - i.x <= character_size[0] or 0 <= i.x - curx <= character_size[0]:
                 if 0 <= cury - i.y <= character_size[1] or 0 <= i.y - cury <= character_size[1]:  
                     if inv == 0:  
@@ -274,10 +306,12 @@ def start_the_game():
         display.blit(character, (curx,cury))
         if sp:
             display.blit(sp_display,(900,50))
+        display.blit(time_display,(490,10))
         display.blit(level_display,(900,10))
+        display.blit(size_display,(600,720))
         display.blit(exp_display,(750,10))
-        display.blit(dmg_display,(750,680))
-        display.blit(as_display,(900,680))
+        display.blit(dmg_display,(750,720))
+        display.blit(as_display,(900,720))
     
         p.display.update()
  
