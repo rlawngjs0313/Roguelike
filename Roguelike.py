@@ -37,38 +37,6 @@ character_size = (80,108)
 monster_size = (80,108)
 
 
-
-
-
-def init():
-    global arrow_png
-    global running
-    global health
-    global respawn_time
-    global attack,attack_delay,inv,inv_delay
-    global curx, cury
-    global level,exp,sp
-    global arrow_list, monster_list
-    global respawn_delay, start, projectile_size
-
-    running = True
-    curx,cury = 300,500
-    attack = 1
-    attack_delay = 0
-    respawn_time = 0
-    exp = 0
-    level = 1
-    arrow_list = []
-    monster_list = []
-    health = 3
-    inv = 0
-    inv_delay = 0
-    respawn_delay = 180
-    sp = 0
-    start = 0
-    projectile_size = 50
-
-
 class monster:
     x = 0
     y = 0
@@ -144,13 +112,37 @@ class arrow:
     
     def delete(self):
         arrow_list.remove(self)
-        
-
-player = chara(3,5,75,5)
-player.bow = 1
 
 
+def init():
+    global arrow_png
+    global running
+    global health
+    global respawn_time
+    global attack,attack_delay,inv,inv_delay
+    global curx, cury
+    global level,exp,sp
+    global arrow_list, monster_list
+    global respawn_delay, start, projectile_size, player
 
+    running = True
+    curx,cury = 300,500
+    attack = 1
+    attack_delay = 0
+    respawn_time = 0
+    exp = 0
+    level = 1
+    arrow_list = []
+    monster_list = []
+    health = 3
+    inv = 0
+    inv_delay = 0
+    respawn_delay = 180
+    sp = 0
+    start = 0
+    projectile_size = 50
+    player = chara(3,5,75,5)
+    player.bow = 1
     
 
 def display_health():
@@ -189,7 +181,7 @@ def start_the_game():
     global respawn_time
     global attack,attack_delay,inv,inv_delay
     global curx, cury
-    global level,exp,sp,start,projectile_size
+    global level,exp,sp,start,projectile_size,player
 
     init()
     
