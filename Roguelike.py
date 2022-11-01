@@ -118,6 +118,17 @@ def rect(x,y):
     
     return False
 
+def stop():
+    global pause, elapsed,t ,start_time
+    if pause:
+        t = elapsed
+    while pause:
+        for event in p.event.get():
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_TAB:
+                    pause = 0
+                    start_time = p.time.get_ticks()
+        p.display.update()
 
 def init():
     global arrow_png
@@ -126,8 +137,8 @@ def init():
     global respawn_time
     global attack,attack_delay,inv,inv_delay
     global level,exp,sp
-    global arrow_list, monster_list
-    global respawn_delay, start, projectile_size, player
+    global arrow_list, monster_list, t
+    global respawn_delay, start, projectile_size, player, pause
     
     running = True
     attack = 1
@@ -144,9 +155,11 @@ def init():
     sp = 0
     start = 0
     projectile_size = 50
+    pause = 0
+    t = 0
     player = chara(3,500,300,5,5,75)
     player.bow = 1
-    
+
 
 def display_health():
     if health == 0.5:
@@ -180,19 +193,20 @@ surface = p.display.set_mode((display_wide, display_height))
 def start_the_game():
     global arrow_png
     global running
-    global health
+    global health, pause
     global respawn_time
     global attack,attack_delay,inv,inv_delay
     global level,exp,sp,start,projectile_size,player
+    global elapsed, t, start_time
 
     init()
     
-    while running :
+    while running:
+        stop()
         if start == 0:
             start_time = p.time.get_ticks()
         start = 1
-
-        elapsed = int((p.time.get_ticks() - start_time) / 1000)
+        elapsed = int((p.time.get_ticks() - start_time) / 1000) + t
         dt = fps.tick(60)
         display.blit(background, (0,0))
         display_health()
@@ -230,6 +244,12 @@ def start_the_game():
                         health = 3
                     else:
                         health += 1
+            if event.type == p.KEYDOWN:
+                if event.key == p.K_TAB and pause == 0:
+                    pause = 1
+                elif event.key == p.K_TAB and pause == 1:
+                    pause = 0
+                    
 
     
         player.dirx = 0
