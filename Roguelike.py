@@ -38,16 +38,35 @@ monster_size = (80,108)
 
 
 
-running = True
-curx,cury = 300,500
-attack = 1
-attack_delay = 0
-respawn_time = 0
-exp = 0
-level = 1
 
-arrow_list = []
-monster_list = []
+
+def init():
+    global arrow_png
+    global running
+    global health
+    global respawn_time
+    global attack,attack_delay,inv,inv_delay
+    global curx, cury
+    global level,exp,sp
+    global arrow_list, monster_list
+    global respawn_delay, start, projectile_size
+
+    running = True
+    curx,cury = 300,500
+    attack = 1
+    attack_delay = 0
+    respawn_time = 0
+    exp = 0
+    level = 1
+    arrow_list = []
+    monster_list = []
+    health = 3
+    inv = 0
+    inv_delay = 0
+    respawn_delay = 180
+    sp = 0
+    start = 0
+    projectile_size = 50
 
 
 class monster:
@@ -129,11 +148,7 @@ class arrow:
 
 player = chara(3,5,75,5)
 player.bow = 1
-health = 3
-inv = 0
-inv_delay = 0
-respawn_delay = 180
-sp = 0
+
 
 
     
@@ -174,12 +189,10 @@ def start_the_game():
     global respawn_time
     global attack,attack_delay,inv,inv_delay
     global curx, cury
-    global level,exp,sp
-    running = True #죽었다가 다시 플레이하혀면 필수
-    health = 3 #죽었다가 다시 플레이하혀면 필수
-    start = 0
-    projectile_size = 50
+    global level,exp,sp,start,projectile_size
 
+    init()
+    
     while running :
         if start == 0:
             start_time = p.time.get_ticks()
