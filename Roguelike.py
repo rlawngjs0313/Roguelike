@@ -118,17 +118,7 @@ def rect(x,y):
     
     return False
 
-def stop():
-    global pause, elapsed,t ,start_time
-    if pause:
-        t = elapsed
-    while pause:
-        for event in p.event.get():
-            if event.type == p.KEYDOWN:
-                if event.key == p.K_TAB:
-                    pause = 0
-                    start_time = p.time.get_ticks()
-        p.display.update()
+
 
 def init():
     global arrow_png
