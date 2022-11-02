@@ -46,6 +46,12 @@ class monster(entity):
             self.y -= self.speed
         elif self.y < player.y:
             self.y += self.speed
+
+    def player_move(self):
+        self.x -= player.speed * player.dirx
+        self.y -= player.speed * player.diry
+        
+                
 class projectile:
     def __init__(self,x,y):
         self.x = x
@@ -64,6 +70,10 @@ class projectile:
     
     def delete(self):
         arrow_list.remove(self)
+
+    def player_move(self):
+        self.x -= player.speed * player.dirx
+        self.y -= player.speed * player.diry
 
 
 class zombie(monster):
@@ -124,6 +134,7 @@ def init():
     global attack,attack_delay,inv,inv_delay, t
     global level,exp,sp, arrow_list, monster_list
     global respawn_delay, start, projectile_size, player, arrow_png
+    global displayx, displayy
     
     running = True
     projectile_size = 40
@@ -143,8 +154,10 @@ def init():
     start = 0
     pause = 0
     t = 0
-    player = chara(3, 500, 300)
+    player = chara(3, 472, 330)
     player.bow = 1
+    displayx = -300
+    displayy = -300
     
 def display_health():
     cnt = 2
@@ -164,6 +177,7 @@ def start_the_game():
     global running, health, respawn_time, t, pause
     global attack,attack_delay,inv,inv_delay, elapsed, arrow_png
     global level,exp,sp,start,projectile_size,player, start_time
+    global displayx, displayy
 
     init()
     
@@ -173,9 +187,14 @@ def start_the_game():
             start_time = p.time.get_ticks()
         start = 1
 
+        if displayx <= -800 or displayx >= 0:
+            displayx = -300
+
+        if displayy <= -800 or displayy >= 0:
+            displayy = -300
         elapsed = int((p.time.get_ticks() - start_time) / 1000) + t
         dt = fps.tick(60)
-        display.blit(file.background, (0, 0))
+        display.blit(file.background, (displayx, displayy))
         display_health()
 
         time_display = font.render("%02d : %02d" %(int(elapsed / 60),elapsed % 60), True, (0,0,0))
@@ -225,16 +244,16 @@ def start_the_game():
         key = p.key.get_pressed()
     
         if key[p.K_LEFT]:
-            player.x -= player.speed
+            displayx += player.speed
             player.dirx = -1
         if key[p.K_RIGHT]:
-            player.x += player.speed
+            displayx -= player.speed
             player.dirx = 1
         if key[p.K_UP]:
-            player.y -= player.speed
+            displayy += player.speed
             player.diry = -1
         if key[p.K_DOWN]:
-            player.y += player.speed
+            displayy -= player.speed
             player.diry = 1
         if key[p.K_F5]: #f5 누르면 재시작
             mainmenu.mainloop(display)
@@ -271,11 +290,14 @@ def start_the_game():
             attack = 1
             attack_delay = 0
     
+        
+
         if player.bow == 1:
             for i in arrow_list:
                 i.move()
                 i.draw()
                 i.remove()
+                i.player_move()
                 for j in monster_list:
                     if rect(i,j):
                         i.delete()
@@ -289,10 +311,12 @@ def start_the_game():
             inv = 0
             inv_delay = 0
 
+
         for i in monster_list:
             i.draw()
             i.remove()
             i.move()
+            i.player_move()
             if rect(player, i):
                 if inv == 0:  
                     health -= 0.5
@@ -301,7 +325,7 @@ def start_the_game():
         display.blit(file.character, (player.x,player.y))
         if sp:
             display.blit(sp_display,(900,50))
-        display.blit(time_display,(490,10))
+        display.blit(time_display,(470,10))
         display.blit(level_display,(900,10))
         display.blit(exp_display,(750,10))
 
