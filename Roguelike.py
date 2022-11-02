@@ -2,14 +2,16 @@ import pygame as p, pygame_menu
 from pygame_menu import themes
 import random as r
 import datafile
+from tkinter import *
 
 file = datafile.file()
+root = Tk()
 
 p.init()
 t = 0
 font = p.font.Font(None, 40)
-display_wide = 1024
-display_height = 768
+display_wide = root.winfo_screenwidth() / 1.5
+display_height = root.winfo_screenheight() / 1.5
 display = p.display.set_mode((display_wide,display_height))
 fps = p.time.Clock()
 p.display.set_caption("Roguelike")
