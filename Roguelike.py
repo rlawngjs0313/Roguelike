@@ -16,7 +16,8 @@ display = p.display.set_mode((display_wide,display_height))
 fps = p.time.Clock()
 p.display.set_caption("Roguelike")
 mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=themes.THEME_SOLARIZED)
-
+midslime = p.transform.scale(file.slime,(60,60))
+smallslime = p.transform.scale(file.slime,(30,30))
 
 class entity:
     def __init__(self,hp,x,y):
@@ -92,31 +93,57 @@ class large_slime(monster):
     def __init__(self,hp,x,y):
         monster.__init__(self,hp,x,y)
         self.size = (100,100)
-        self.speed = 2
-        self.expr = 2
+        self.speed = 3
+        self.expr = 5
 
     def draw(self):
-        display.blit(file.monster_png, (self.x, self.y))
+        display.blit(file.slime, (self.x, self.y))
 
-class zombie(monster):
+    def remove(self):
+        global exp
+        if self.hp <= 0:
+            monster_list.remove(self)   
+            exp += self.expr
+            middle_slime_p = middle_slime(16,self.x - 30,self.y)
+            middle_slime_p = middle_slime(16,self.x + 30,self.y)
+
+class middle_slime(monster):
     def __init__(self,hp,x,y):
         monster.__init__(self,hp,x,y)
-        self.size = (80,108)
+        self.size = (60,60)
         self.speed = 2
-        self.expr = 2
+        self.expr = 3
 
     def draw(self):
-        display.blit(file.monster_png, (self.x, self.y))
+        display.blit(midslime, (self.x, self.y))
+    
+    def remove(self):
+        global exp
+        if self.hp <= 0:
+            monster_list.remove(self)   
+            exp += self.expr
+            small_slime_p = small_slime(8,self.x - 30,self.y)
+            small_slime_p = small_slime(8,self.x + 30,self.y)
 
-class zombie(monster):
+class small_slime(monster):
     def __init__(self,hp,x,y):
         monster.__init__(self,hp,x,y)
-        self.size = (80,108)
-        self.speed = 2
-        self.expr = 2
+        self.size = (30,30)
+        self.speed = 1
+        self.expr = 1
 
     def draw(self):
-        display.blit(file.monster_png, (self.x, self.y))
+        display.blit(smallslime, (self.x, self.y))
+
+class skeleton(monster):
+    def __init__(self,hp,x,y):
+        monster.__init__(self,hp,x,y)
+        self.size = (25,25)
+        self.speed = 2
+        self.expr = 1
+
+    def draw(self):
+        display.blit(file.skeleton, (self.x, self.y))
 
 
 
@@ -168,7 +195,7 @@ def init():
     global attack,attack_delay,inv,inv_delay, t
     global level,exp,sp, arrow_list, monster_list
     global respawn_delay, start, projectile_size, player, arrow_png
-    global displayx, displayy
+    global displayx, displayy, time_check
     
     running = True
     projectile_size = 40
@@ -192,6 +219,7 @@ def init():
     player.bow = 1
     displayx = -300
     displayy = -300
+    time_check = 5
     
 def display_health():
     cnt = 2
@@ -208,7 +236,7 @@ def display_health():
         cnt -= 1
 
 def respawn():
-    global respawn_time, respawn_delay
+    global respawn_time, respawn_delay, time_check
     if respawn_time >= respawn_delay:
             respawn_time = 0
             minusx = list(range(int(player.x - 600), int(player.x - 500)))
@@ -217,14 +245,34 @@ def respawn():
             plusy = list(range(int(player.y + 500), int(player.y + 600)))
             spawnx = r.sample(minusx + plusx,1)
             spawny = r.sample(minusy + plusy,1)
-            zombie_p = zombie(10,spawnx[0],spawny[0])
+            spawn_mob = r.sample(list(range(1,101)), 1)
+            spawn_mob = spawn_mob[0]
+            if time_check < 1:
+                zombie_p = zombie(10,spawnx[0],spawny[0])
+            elif time_check < 3:
+                if spawn_mob <= 20:
+                    middle_slime_p = middle_slime(16,spawnx[0],spawny[0])
+                else:
+                    zombie_p = zombie(10,spawnx[0],spawny[0])
+            elif time_check < 5:
+                if spawn_mob <= 50:
+                    middle_slime_p = middle_slime(16,spawnx[0],spawny[0])
+                else:
+                    zombie_p = zombie(10,spawnx[0],spawny[0])
+            elif time_check < 8:
+                if spawn_mob <= 10:
+                    large_slime_p = large_slime(24,spawnx[0],spawny[0])
+                elif spawn_mob <= 80:
+                    middle_slime_p = middle_slime(16,spawnx[0],spawny[0])
+                else:
+                    zombie_p = zombie(10,spawnx[0],spawny[0])
 
 
 def start_the_game():
     global running, health, respawn_time, t, pause
     global attack,attack_delay,inv,inv_delay, elapsed, arrow_png
     global level,exp,sp,start,projectile_size,player, start_time
-    global displayx, displayy
+    global displayx, displayy, time_check, respawn_delay
 
     init()
     
@@ -320,6 +368,10 @@ def start_the_game():
     
         respawn_time += 1
         respawn()
+
+        if time_check < elapsed / 60000:
+            time_check += 1
+            respawn_delay *= 0.95
         
 
         if attack == 0:

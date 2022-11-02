@@ -20,6 +20,6 @@ class file:
         self.empty_heart = p.image.load(os.path.join(DIR_IMAGE, "no_heart.png"))
         self.empty_heart = p.transform.scale(self.empty_heart,(30,30))
         self.slime = p.image.load(os.path.join(DIR_IMAGE, "slime.png"))
-        self.slime = p.transform.scale(self.slime, (100, 100))
+        self.slime = p.transform.scale(self.slime, (120, 120))
         self.skeleton = p.image.load(os.path.join(DIR_IMAGE, "skeleton.png"))
         self.skeleton = p.transform.scale(self.skeleton, (80, 108))
