@@ -48,6 +48,10 @@ class monster(entity):
         elif self.y < player.y:
             self.y += self.speed
 
+    def player_move(self):
+        self.x -= player.dirx * player.speed
+        self.y -= player.diry * player.speed
+
 class projectile:
     def __init__(self,x,y):
         self.x = x
@@ -66,6 +70,10 @@ class projectile:
     
     def delete(self):
         arrow_list.remove(self)
+    
+    def player_move(self):
+        self.x -= player.dirx * player.speed
+        self.y -= player.diry * player.speed
 
 
 class zombie(monster):
@@ -145,7 +153,7 @@ def init():
     start = 0
     pause = 0
     t = 0
-    player = chara(3, 500 , 300)
+    player = chara(3, 472 , 330)
     player.bow = 1
     
 def display_health():
@@ -240,16 +248,16 @@ def start_the_game():
         key = p.key.get_pressed()
     
         if key[p.K_LEFT]:
-            player.x -= player.speed
+            
             player.dirx = -1
         if key[p.K_RIGHT]:
-            player.x += player.speed
+            
             player.dirx = 1
         if key[p.K_UP]:
-            player.y -= player.speed
+            
             player.diry = -1
         if key[p.K_DOWN]:
-            player.y += player.speed
+            
             player.diry = 1
         if key[p.K_F5]: #f5 누르면 재시작
             mainmenu.mainloop(display)
@@ -258,6 +266,7 @@ def start_the_game():
             exp -= 2 * level ** 2
             level += 1
             sp += 1
+        
         
 
         if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
@@ -291,6 +300,7 @@ def start_the_game():
                 i.move()
                 i.draw()
                 i.remove()
+                i.player_move()
                 for j in monster_list:
                     if rect(i,j):
                         i.delete()
@@ -308,6 +318,7 @@ def start_the_game():
             i.draw()
             i.remove()
             i.move()
+            i.player_move()
             if rect(player, i):
                 if inv == 0:  
                     health -= 0.5
