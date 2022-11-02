@@ -17,18 +17,17 @@ mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=the
 
 
 class entity:
-    def __init__(self,hp,x,y,speed):
+    def __init__(self,hp,x,y):
         self.x = x
         self.y = y
         self.hp = hp
-        self.speed = speed
+
 
 class monster(entity):
-    def __init__(self, hp, x, y, speed, expr):
-        entity.__init__(self,hp,x,y,speed)
-        self.expr = expr
+    def __init__(self, hp, x, y):
+        entity.__init__(self,hp,x,y)
         monster_list.append(self)
-    
+
     def remove(self):
         global exp
         if self.hp <= 0:
@@ -49,52 +48,62 @@ class monster(entity):
         elif self.y < player.y:
             self.y += self.speed
 
+class projectile:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.dirx = player.dirx
+        self.diry = player.diry
+        self.size = (projectile_size,projectile_size) 
+
+    def remove(self):
+        if(self.x >= display_wide + 50 or self.x <= -50):
+            arrow_list.remove(self)
+    
+    def move(self):
+        self.x += self.dirx * player.projectile_speed
+        self.y += self.diry * player.projectile_speed
+    
+    def delete(self):
+        arrow_list.remove(self)
+
+
 class zombie(monster):
-    def __init__(self,hp,x,y,speed,expr):
-        monster.__init__(self,hp,x,y,speed,expr)
+    def __init__(self,hp,x,y):
+        monster.__init__(self,hp,x,y)
         self.size = (80,108)
+        self.speed = 1
+        self.expr = 2
 
     def draw(self):
         display.blit(file.monster_png, (self.x, self.y))
 
 class chara(entity):
-    def __init__(self, hp, x, y,speed,dmg,attack_speed):
-        entity.__init__(self,hp,x,y,speed)
-        self.dmg = dmg
-        self.attack_speed = attack_speed
-        self.speed = speed
-    bow = 0
-    sword = 0
-    dirx = 0
-    diry = 0
-    size = (80, 108)
+    def __init__(self, hp, x, y):
+        entity.__init__(self,hp,x,y)
+        self.dmg = 10
+        self.attack_speed = 75
+        self.speed = 5
+        self.projectile_speed = 10
+        self.bow = 0
+        self.sword = 0
+        self.dirx = 0
+        self.diry = 0
+        self.size = (80, 108)
 
-class arrow:
+class arrow(projectile):
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.dirx = player.dirx
-        self.diry = player.diry
-        self.size = (50, 50)
-    
-    def remove(self):
-        if(self.x >= display_wide + 50 or self.x <= -50):
-            arrow_list.remove(self)
-
+        projectile.__init__(self,x,y)
+        
     def draw(self):
         if self.dirx != 0 or self.diry != 0:
             display.blit(file.arrow_png ,(self.x,self.y))
        
-    def move(self):
-        self.x += self.dirx * 10
-        self.y += self.diry * 10
-    
-    def delete(self):
-        arrow_list.remove(self)
+
 
 def rect(x,y):
-    if 0 <= x.x - y.x <= x.size[0] or 0 <= y.x - x.x <= y.size[0]:
-        if 0 <= x.y - y.y <= x.size[1] or 0 <= y.y - x.y <= y.size[1]:
+    if 0 <= x.x - y.x <= y.size[0] or 0 <= y.x - x.x <= x.size[0]:
+        if 0 <= x.y - y.y <= y.size[1] or 0 <= y.y - x.y <= x.size[1]:
             return True
     
     return False
@@ -134,7 +143,7 @@ def init():
     projectile_size = 50
     pause = 0
     t = 0
-    player = chara(3,500,300,5,5,75)
+    player = chara(3, 500 , 300)
     player.bow = 1
     
 def display_health():
@@ -207,6 +216,7 @@ def start_the_game():
                 elif event.key == p.K_3:
                     sp -= 1
                     projectile_size *= 1.2
+                    global arrow_png
                     arrow_png = p.transform.scale(file.arrow_png,(projectile_size,projectile_size))
                 elif event.key == p.K_4:
                     sp -= 1
@@ -264,7 +274,7 @@ def start_the_game():
             plusy = list(range(player.y + 500, player.y + 600))
             spawnx = r.sample(minusx + plusx,1)
             spawny = r.sample(minusy + plusy,1)
-            zombie_p = zombie(10,spawnx[0],spawny[0],1,2)
+            zombie_p = zombie(10,spawnx[0],spawny[0])
         
 
         if attack == 0:
