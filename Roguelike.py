@@ -82,19 +82,51 @@ class zombie(monster):
     def __init__(self,hp,x,y):
         monster.__init__(self,hp,x,y)
         self.size = (80,108)
-        self.speed = 1
+        self.speed = 2
         self.expr = 2
 
     def draw(self):
         display.blit(file.monster_png, (self.x, self.y))
 
+class large_slime(monster):
+    def __init__(self,hp,x,y):
+        monster.__init__(self,hp,x,y)
+        self.size = (100,100)
+        self.speed = 2
+        self.expr = 2
+
+    def draw(self):
+        display.blit(file.monster_png, (self.x, self.y))
+
+class zombie(monster):
+    def __init__(self,hp,x,y):
+        monster.__init__(self,hp,x,y)
+        self.size = (80,108)
+        self.speed = 2
+        self.expr = 2
+
+    def draw(self):
+        display.blit(file.monster_png, (self.x, self.y))
+
+class zombie(monster):
+    def __init__(self,hp,x,y):
+        monster.__init__(self,hp,x,y)
+        self.size = (80,108)
+        self.speed = 2
+        self.expr = 2
+
+    def draw(self):
+        display.blit(file.monster_png, (self.x, self.y))
+
+
+
 class chara(entity):
     def __init__(self, hp, x, y):
         entity.__init__(self,hp,x,y)
-        self.dmg = 10
+        self.dmg = 5
         self.attack_speed = 75
         self.speed = 5
-        self.projectile_speed = 10
+        self.projectile_speed = 8
         self.bow = 0
         self.sword = 0
         self.dirx = 0
@@ -156,7 +188,7 @@ def init():
     start = 0
     pause = 0
     t = 0
-    player = chara(3, 472, 330)
+    player = chara(3, display_wide / 2 - 40, display_height / 2 - 54)
     player.bow = 1
     displayx = -300
     displayy = -300
@@ -174,6 +206,19 @@ def display_health():
         else:
             display.blit(file.heart, (x, 5))
         cnt -= 1
+
+def respawn():
+    global respawn_time, respawn_delay
+    if respawn_time >= respawn_delay:
+            respawn_time = 0
+            minusx = list(range(int(player.x - 600), int(player.x - 500)))
+            minusy = list(range(int(player.y - 500), int(player.y - 400)))
+            plusx = list(range(int(player.x + 500), int(player.x + 600)))
+            plusy = list(range(int(player.y + 500), int(player.y + 600)))
+            spawnx = r.sample(minusx + plusx,1)
+            spawny = r.sample(minusy + plusy,1)
+            zombie_p = zombie(10,spawnx[0],spawny[0])
+
 
 def start_the_game():
     global running, health, respawn_time, t, pause
@@ -274,15 +319,7 @@ def start_the_game():
                 arrow_list.append(arrow_p)
     
         respawn_time += 1
-        if respawn_time >= respawn_delay:
-            respawn_time = 0
-            minusx = list(range(player.x - 600, player.x - 500))
-            minusy = list(range(player.y - 500, player.y - 400))
-            plusx = list(range(player.x + 500, player.x + 600))
-            plusy = list(range(player.y + 500, player.y + 600))
-            spawnx = r.sample(minusx + plusx,1)
-            spawny = r.sample(minusy + plusy,1)
-            zombie_p = zombie(10,spawnx[0],spawny[0])
+        respawn()
         
 
         if attack == 0:
@@ -326,10 +363,10 @@ def start_the_game():
 
         display.blit(file.character, (player.x,player.y))
         if sp:
-            display.blit(sp_display,(900,50))
-        display.blit(time_display,(470,10))
-        display.blit(level_display,(900,10))
-        display.blit(exp_display,(750,10))
+            display.blit(sp_display,(display_wide - 100,50))
+        display.blit(time_display,(display_wide / 2 - 45,10))
+        display.blit(level_display,(display_wide - 100,10))
+        display.blit(exp_display,(display_wide - 250,10))
 
         if key[p.K_TAB]:
             display.blit(dmg_display,(750,720))
