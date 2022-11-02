@@ -56,11 +56,16 @@ class monster(entity):
         
                 
 class projectile:
+    global prevx,prevy
     def __init__(self,x,y):
         self.x = x
         self.y = y
-        self.dirx = player.dirx
-        self.diry = player.diry
+        if player.dirx != 0 or player.diry != 0:
+            self.dirx = player.dirx
+            self.diry = player.diry
+        else:
+            self.dirx = prevx
+            self.diry = prevy
         self.size = (projectile_size, projectile_size)
     
     def remove(self):
@@ -70,6 +75,7 @@ class projectile:
     def move(self):
         self.x += self.dirx * player.projectile_speed
         self.y += self.diry * player.projectile_speed
+    
     
     def delete(self):
         arrow_list.remove(self)
@@ -170,7 +176,6 @@ class arrow(projectile):
             display.blit(arrow_png ,(self.x,self.y))
 
 
-
 def rect(x,y):
     if 0 <= x.x - y.x <= y.size[0] or 0 <= y.x - x.x <= x.size[0]:
         if 0 <= x.y - y.y <= y.size[1] or 0 <= y.y - x.y <= x.size[1]:
@@ -195,7 +200,7 @@ def init():
     global attack,attack_delay,inv,inv_delay, t
     global level,exp,sp, arrow_list, monster_list
     global respawn_delay, start, projectile_size, player, arrow_png
-    global displayx, displayy, time_check
+    global displayx, displayy, time_check, prevx, prevy
     
     running = True
     projectile_size = 40
@@ -220,6 +225,8 @@ def init():
     displayx = -300
     displayy = -300
     time_check = 5
+    prevx = 1
+    prevy = 1
     
 def display_health():
     cnt = 2
@@ -234,6 +241,45 @@ def display_health():
         else:
             display.blit(file.heart, (x, 5))
         cnt -= 1
+
+def moving():
+    global displayx, displayy, prevx, prevy
+    key = p.key.get_pressed()
+    
+    if key[p.K_LEFT]:
+        displayx += player.speed
+        player.dirx = -1
+        prevx = -1
+        if key[p.K_UP]:
+            prevy = -1
+            player.diry = -1
+        elif key[p.K_DOWN]:
+            prevy = 1
+            player.diry = 1
+        else:
+            prevy = 0
+    elif key[p.K_RIGHT]:
+        displayx -= player.speed
+        player.dirx = 1
+        prevx = 1
+        if key[p.K_UP]:
+            prevy = -1
+            player.diry = -1
+        elif key[p.K_DOWN]:
+            prevy = 1
+            player.diry = 1
+        else:
+            prevy = 0
+    elif key[p.K_UP]:
+        displayy += player.speed
+        player.diry = -1
+        prevy = -1
+        prevx = 0
+    elif key[p.K_DOWN]:
+        displayy -= player.speed
+        player.diry = 1
+        prevy = 1
+        prevx = 0
 
 def respawn():
     global respawn_time, respawn_delay, time_check
@@ -337,19 +383,8 @@ def start_the_game():
         player.diry = 0
 
         key = p.key.get_pressed()
-    
-        if key[p.K_LEFT]:
-            displayx += player.speed
-            player.dirx = -1
-        if key[p.K_RIGHT]:
-            displayx -= player.speed
-            player.dirx = 1
-        if key[p.K_UP]:
-            displayy += player.speed
-            player.diry = -1
-        if key[p.K_DOWN]:
-            displayy -= player.speed
-            player.diry = 1
+        moving()
+
         if key[p.K_F5]: #f5 누르면 재시작
             mainmenu.mainloop(display)
 
