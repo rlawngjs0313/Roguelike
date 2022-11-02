@@ -22,12 +22,11 @@ class entity:
         self.y = y
         self.hp = hp
 
-
 class monster(entity):
     def __init__(self, hp, x, y):
         entity.__init__(self,hp,x,y)
         monster_list.append(self)
-
+    
     def remove(self):
         global exp
         if self.hp <= 0:
@@ -47,33 +46,24 @@ class monster(entity):
             self.y -= self.speed
         elif self.y < player.y:
             self.y += self.speed
-
-    def player_move(self):
-        self.x -= player.dirx * player.speed
-        self.y -= player.diry * player.speed
-
 class projectile:
     def __init__(self,x,y):
         self.x = x
         self.y = y
         self.dirx = player.dirx
         self.diry = player.diry
-        self.size = (projectile_size,projectile_size) 
-
+        self.size = (projectile_size, projectile_size)
+    
     def remove(self):
         if(self.x >= display_wide + 50 or self.x <= -50):
             arrow_list.remove(self)
-    
+       
     def move(self):
         self.x += self.dirx * player.projectile_speed
         self.y += self.diry * player.projectile_speed
     
     def delete(self):
         arrow_list.remove(self)
-    
-    def player_move(self):
-        self.x -= player.dirx * player.speed
-        self.y -= player.diry * player.speed
 
 
 class zombie(monster):
@@ -102,12 +92,12 @@ class chara(entity):
 class arrow(projectile):
     def __init__(self, x, y):
         projectile.__init__(self,x,y)
-        
+
     def draw(self):
         global arrow_png
         if self.dirx != 0 or self.diry != 0:
             display.blit(arrow_png ,(self.x,self.y))
-       
+
 
 
 def rect(x,y):
@@ -137,7 +127,7 @@ def init():
     
     running = True
     projectile_size = 40
-    arrow_png = p.transform.scale(file.arrow_png,(projectile_size,projectile_size))
+    arrow_png = p.transform.scale(file.arrow_png, (projectile_size, projectile_size))
     attack = 1
     attack_delay = 0
     respawn_time = 0
@@ -153,40 +143,27 @@ def init():
     start = 0
     pause = 0
     t = 0
-    player = chara(3, 472 , 330)
+    player = chara(3, 500, 300)
     player.bow = 1
     
 def display_health():
-    if health == 0.5:
-        display.blit(file.half_heart,(5,5))
-        display.blit(file.empty_heart,(35,5))
-        display.blit(file.empty_heart,(65,5))
-    elif health == 1:
-        display.blit(file.heart,(5,5))
-        display.blit(file.empty_heart,(35,5))
-        display.blit(file.empty_heart,(65,5))
-    elif health == 1.5:
-        display.blit(file.heart,(5,5))
-        display.blit(file.half_heart,(35,5))
-        display.blit(file.empty_heart,(65,5))
-    elif health == 2:
-        display.blit(file.heart,(5,5))
-        display.blit(file.heart,(35,5))
-        display.blit(file.empty_heart,(65,5))
-    elif health == 2.5:
-        display.blit(file.heart,(5,5))
-        display.blit(file.heart,(35,5))
-        display.blit(file.half_heart,(65,5))
-    elif health == 3:
-        display.blit(file.heart,(5,5))
-        display.blit(file.heart,(35,5))
-        display.blit(file.heart,(65,5))
+    cnt = 2
+    localHealth = health
+    while cnt > -1:
+        x = 30*cnt + 5
+        if localHealth - cnt <= 0:
+            display.blit(file.empty_heart, (x, 5))
+        elif localHealth % 1 != 0:
+            display.blit(file.half_heart, (x, 5))
+            localHealth -= 0.5
+        else:
+            display.blit(file.heart, (x, 5))
+        cnt -= 1
 
 def start_the_game():
     global running, health, respawn_time, t, pause
-    global attack,attack_delay,inv,inv_delay, elapsed
+    global attack,attack_delay,inv,inv_delay, elapsed, arrow_png
     global level,exp,sp,start,projectile_size,player, start_time
-    global arrow_png
 
     init()
     
@@ -248,16 +225,16 @@ def start_the_game():
         key = p.key.get_pressed()
     
         if key[p.K_LEFT]:
-            
+            player.x -= player.speed
             player.dirx = -1
         if key[p.K_RIGHT]:
-            
+            player.x += player.speed
             player.dirx = 1
         if key[p.K_UP]:
-            
+            player.y -= player.speed
             player.diry = -1
         if key[p.K_DOWN]:
-            
+            player.y += player.speed
             player.diry = 1
         if key[p.K_F5]: #f5 누르면 재시작
             mainmenu.mainloop(display)
@@ -266,7 +243,6 @@ def start_the_game():
             exp -= 2 * level ** 2
             level += 1
             sp += 1
-        
         
 
         if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
@@ -300,7 +276,6 @@ def start_the_game():
                 i.move()
                 i.draw()
                 i.remove()
-                i.player_move()
                 for j in monster_list:
                     if rect(i,j):
                         i.delete()
@@ -318,7 +293,6 @@ def start_the_game():
             i.draw()
             i.remove()
             i.move()
-            i.player_move()
             if rect(player, i):
                 if inv == 0:  
                     health -= 0.5
@@ -330,12 +304,12 @@ def start_the_game():
         display.blit(time_display,(490,10))
         display.blit(level_display,(900,10))
         display.blit(exp_display,(750,10))
-    
+
         if key[p.K_TAB]:
             display.blit(dmg_display,(750,720))
             display.blit(as_display,(900,720))
             display.blit(size_display,(600,720))
-    
+        
         p.display.update()
 
 mainmenu.add.button('Play', start_the_game)
