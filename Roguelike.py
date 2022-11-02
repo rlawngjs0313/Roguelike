@@ -96,8 +96,9 @@ class arrow(projectile):
         projectile.__init__(self,x,y)
         
     def draw(self):
+        global arrow_png
         if self.dirx != 0 or self.diry != 0:
-            display.blit(file.arrow_png ,(self.x,self.y))
+            display.blit(arrow_png ,(self.x,self.y))
        
 
 
@@ -124,9 +125,11 @@ def init():
     global running, health, respawn_time, pause
     global attack,attack_delay,inv,inv_delay, t
     global level,exp,sp, arrow_list, monster_list
-    global respawn_delay, start, projectile_size, player
+    global respawn_delay, start, projectile_size, player, arrow_png
     
     running = True
+    projectile_size = 40
+    arrow_png = p.transform.scale(file.arrow_png,(projectile_size,projectile_size))
     attack = 1
     attack_delay = 0
     respawn_time = 0
@@ -140,7 +143,6 @@ def init():
     respawn_delay = 180
     sp = 0
     start = 0
-    projectile_size = 50
     pause = 0
     t = 0
     player = chara(3, 500 , 300)
@@ -176,6 +178,7 @@ def start_the_game():
     global running, health, respawn_time, t, pause
     global attack,attack_delay,inv,inv_delay, elapsed
     global level,exp,sp,start,projectile_size,player, start_time
+    global arrow_png
 
     init()
     
@@ -216,7 +219,6 @@ def start_the_game():
                 elif event.key == p.K_3:
                     sp -= 1
                     projectile_size *= 1.2
-                    global arrow_png
                     arrow_png = p.transform.scale(file.arrow_png,(projectile_size,projectile_size))
                 elif event.key == p.K_4:
                     sp -= 1
@@ -316,10 +318,12 @@ def start_the_game():
             display.blit(sp_display,(900,50))
         display.blit(time_display,(490,10))
         display.blit(level_display,(900,10))
-        display.blit(size_display,(600,720))
         display.blit(exp_display,(750,10))
-        display.blit(dmg_display,(750,720))
-        display.blit(as_display,(900,720))
+    
+        if key[p.K_TAB]:
+            display.blit(dmg_display,(750,720))
+            display.blit(as_display,(900,720))
+            display.blit(size_display,(600,720))
     
         p.display.update()
 
