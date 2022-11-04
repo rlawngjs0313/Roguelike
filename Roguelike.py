@@ -10,36 +10,36 @@ root = Tk()
 p.init()
 t = 0
 font = p.font.Font(None, 40)
-display_wide = root.winfo_screenwidth() / 1.5
-display_height = root.winfo_screenheight() / 1.5
-display = p.display.set_mode((display_wide,display_height))
+display_wide = root.winfo_screenwidth() / 1.5 #화면 가로 크기
+display_height = root.winfo_screenheight() / 1.5 #화면 세로 크기
+display = p.display.set_mode((display_wide,display_height)) #화면 크기 설정
 fps = p.time.Clock()
-p.display.set_caption("Roguelike")
+p.display.set_caption("Roguelike") #게임 이름
 mainmenu = pygame_menu.Menu('Roguelike', display_wide, display_height, theme=themes.THEME_SOLARIZED)
-midslime = p.transform.scale(file.slime,(60,60))
-smallslime = p.transform.scale(file.slime,(30,30))
+midslime = p.transform.scale(file.slime,(60,60)) #중간 크기 슬라임
+smallslime = p.transform.scale(file.slime,(30,30)) #작은 크기 슬라임
 
-class entity:
+class entity: #entity 클래스 hp, x, y 값을 가짐
     def __init__(self,hp,x,y):
         self.x = x
         self.y = y
         self.hp = hp
 
-class monster(entity):
+class monster(entity): #monster 클래스
     def __init__(self, hp, x, y):
         entity.__init__(self,hp,x,y)
         monster_list.append(self)
     
-    def remove(self):
+    def remove(self): #hp 0 이하로 떨어지면 죽음
         global exp
         if self.hp <= 0:
             monster_list.remove(self)   
             exp += self.expr
 
-    def attack(self, att):
+    def attack(self, att): #데미지를 받음
         self.hp -= att
     
-    def move(self):
+    def move(self): #플레이어 방향으로 움직임
         if self.x > player.x:
             self.x -= self.speed
         elif self.x < player.x:
@@ -50,12 +50,12 @@ class monster(entity):
         elif self.y < player.y:
             self.y += self.speed
 
-    def player_move(self):
+    def player_move(self): 
         self.x -= player.speed * player.dirx
         self.y -= player.speed * player.diry
         
                 
-class projectile:
+class projectile: #투사체 클래스 x, y 값을 가짐
     global prevx,prevy
     def __init__(self,x,y):
         self.x = x
@@ -68,11 +68,11 @@ class projectile:
             self.diry = prevy
         self.size = (projectile_size, projectile_size)
     
-    def remove(self):
+    def remove(self): #화면 밖으로 나가면 삭제
         if(self.x >= display_wide + 50 or self.x <= -50):
             arrow_list.remove(self)
        
-    def move(self):
+    def move(self): #투사체 속도만큼 움직임
         self.x += self.dirx * player.projectile_speed
         self.y += self.diry * player.projectile_speed
     
@@ -144,7 +144,7 @@ class small_slime(monster):
 class skeleton(monster):
     def __init__(self,hp,x,y):
         monster.__init__(self,hp,x,y)
-        self.size = (25,25)
+        self.size = (80,108)
         self.speed = 2
         self.expr = 1
 
@@ -153,7 +153,7 @@ class skeleton(monster):
 
 
 
-class chara(entity):
+class chara(entity): #플레이어 
     def __init__(self, hp, x, y):
         entity.__init__(self,hp,x,y)
         self.dmg = 5
@@ -176,14 +176,14 @@ class arrow(projectile):
             display.blit(arrow_png ,(self.x,self.y))
 
 
-def rect(x,y):
+def rect(x,y): #충돌 판정 함수
     if 0 <= x.x - y.x <= y.size[0] or 0 <= y.x - x.x <= x.size[0]:
         if 0 <= x.y - y.y <= y.size[1] or 0 <= y.y - x.y <= x.size[1]:
             return True
     
     return False
 
-def pausing():
+def pausing(): #일시정지
     global pause, elapsed,t ,start_time
     if pause:
         t = elapsed
@@ -195,7 +195,7 @@ def pausing():
                     start_time = p.time.get_ticks()
         p.display.update()
 
-def init():
+def init(): #게임 초기화
     global running, health, respawn_time, pause
     global attack,attack_delay,inv,inv_delay, t
     global level,exp,sp, arrow_list, monster_list
@@ -228,7 +228,7 @@ def init():
     prevx = 1
     prevy = 1
     
-def display_health():
+def display_health(): #hp UI 띄우기
     cnt = 2
     localHealth = health
     while cnt > -1:
@@ -242,7 +242,7 @@ def display_health():
             display.blit(file.heart, (x, 5))
         cnt -= 1
 
-def moving():
+def moving(): #움직임 구현
     global displayx, displayy, prevx, prevy
     key = p.key.get_pressed()
     
@@ -281,7 +281,7 @@ def moving():
         prevy = 1
         prevx = 0
 
-def respawn():
+def respawn(): #몬스터 생성 구현
     global respawn_time, respawn_delay, time_check
     if respawn_time >= respawn_delay:
             respawn_time = 0
@@ -314,7 +314,7 @@ def respawn():
                     zombie_p = zombie(10,spawnx[0],spawny[0])
 
 
-def start_the_game():
+def start_the_game(): #게임 시작
     global running, health, respawn_time, t, pause
     global attack,attack_delay,inv,inv_delay, elapsed, arrow_png
     global level,exp,sp,start,projectile_size,player, start_time
@@ -328,14 +328,14 @@ def start_the_game():
             start_time = p.time.get_ticks()
         start = 1
 
-        if displayx <= -800 or displayx >= 0:
+        if displayx <= -800 or displayx >= 0: #x축을 벗어나면 다시 돌아옴
             displayx = -300
 
-        if displayy <= -800 or displayy >= 0:
+        if displayy <= -800 or displayy >= 0: #y축을 벗어나면 다시 돌아옴
             displayy = -300
-        elapsed = int((p.time.get_ticks() - start_time) / 1000) + t
-        dt = fps.tick(60)
-        display.blit(file.background, (displayx, displayy))
+        elapsed = int((p.time.get_ticks() - start_time) / 1000) + t #시간 경과 표현
+        dt = fps.tick(60) #프레임 60 제한
+        display.blit(file.background, (displayx, displayy)) #화면 표현
         display_health()
 
         time_display = font.render("%02d : %02d" %(int(elapsed / 60),elapsed % 60), True, (0,0,0))
@@ -346,15 +346,15 @@ def start_the_game():
         dmg_display = font.render("dmg " + str(player.dmg), True, (0,0,0))
         as_display = font.render("as %.2f" %(60 / player.attack_speed), True, (0,0,0))
 
-        if health == 0:
+        if health == 0: #hp가 0이면 게임 종료
             running = False
 
         for event in p.event.get():
-            if event.type == p.QUIT:
+            if event.type == p.QUIT: #강제 종료하면 게임 종료
                 running = False
             
 
-            if event.type == p.KEYDOWN and sp >= 1:
+            if event.type == p.KEYDOWN and sp >= 1: #스킬 포인트가 1 이상 있을 때
                 if event.key == p.K_1:
                     sp -= 1
                     player.dmg += 3
@@ -372,7 +372,7 @@ def start_the_game():
                     else:
                         health += 1
 
-            if event.type == p.KEYDOWN:
+            if event.type == p.KEYDOWN: #일시 정지 esc키
                 if event.key == p.K_ESCAPE and pause == 0:
                     pause = 1
                 elif event.key == p.K_ESCAPE and pause == 1:
@@ -388,53 +388,53 @@ def start_the_game():
         if key[p.K_F5]: #f5 누르면 재시작
             mainmenu.mainloop(display)
 
-        if exp >= 2 * level ** 2:
+        if exp >= 2 * level ** 2: #레벨 업 하는데 필요한 경험치 량
             exp -= 2 * level ** 2
             level += 1
             sp += 1
         
 
-        if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack:
-            if player.bow == 1:
+        if (key[p.K_LCTRL] or key[p.K_RCTRL]) and attack: #공격 키
+            if player.bow == 1: #무기가 활일 때
                 attack = 0
                 delay = player.attack_speed
                 arrow_p = arrow(player.x,player.y)
                 arrow_list.append(arrow_p)
     
-        respawn_time += 1
+        respawn_time += 1 #몬스터 리젠 시간(60에 1초)
         respawn()
 
-        if time_check < elapsed / 60000:
+        if time_check < elapsed / 60000: #1분마다 몬스터 리젠 시간 감소
             time_check += 1
             respawn_delay *= 0.95
         
 
-        if attack == 0:
-            attack_delay += 1
+        if attack == 0: #공격 불가능 일 때
+            attack_delay += 1 
 
-        if attack_delay >= player.attack_speed:
-            attack = 1
+        if attack_delay >= player.attack_speed: #공격 속도 설정
+            attack = 1 #공격 가능
             attack_delay = 0
     
         
 
-        if player.bow == 1:
+        if player.bow == 1: 
             for i in arrow_list:
                 i.move()
                 i.draw()
                 i.remove()
                 i.player_move()
-                for j in monster_list:
-                    if rect(i,j):
-                        i.delete()
-                        j.attack(player.dmg)
+                for j in monster_list: 
+                    if rect(i,j): #화살과 몬스터가 충돌 할 때
+                        i.delete() #화살 삭제
+                        j.attack(player.dmg) #몬스터가 데미지 받음
                         break
     
-        if inv == 1:
+        if inv == 1: 
             inv_delay += 0.1
 
-        if inv == 1 and inv_delay >= 4:
-            inv = 0
+        if inv == 1 and inv_delay >= 4: #무적이고 무적이 된지 0.66초가 지나면
+            inv = 0 #무적 해제
             inv_delay = 0
 
 
@@ -443,10 +443,10 @@ def start_the_game():
             i.remove()
             i.move()
             i.player_move()
-            if rect(player, i):
-                if inv == 0:  
-                    health -= 0.5
-                    inv = 1
+            if rect(player, i): #플레이어와 몬스터가 충돌 할 때
+                if inv == 0: #무적이 아니면
+                    health -= 0.5 #hp 반 칸 줄음
+                    inv = 1 #무적 상태가 됨
 
         display.blit(file.character, (player.x,player.y))
         if sp:
