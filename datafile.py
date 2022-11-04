@@ -23,3 +23,9 @@ class file:
         self.slime = p.transform.scale(self.slime, (120, 120))
         self.skeleton = p.image.load(os.path.join(DIR_IMAGE, "skeleton.png"))
         self.skeleton = p.transform.scale(self.skeleton, (80, 108))
+        self.pick_window = p.image.load(os.path.join(DIR_IMAGE, "pickup_window.png"))
+        self.pick_window = p.transform.scale(self.pick_window, (400, 50))   # 원본 픽셀값: 400, 50
+        self.Image_attackSpeed = p.image.load(os.path.join(DIR_IMAGE, "attackSpeed.png"))
+        self.Image_attackSpeed = p.transform.scale(self.Image_attackSpeed, (40, 40))    # 원본 픽셀값: 40, 40
+        self.Image_power = p.image.load(os.path.join(DIR_IMAGE, "power.png"))
+        self.Image_power = p.transform.scale(self.Image_power, (40, 40))    # 원본 픽셀값: 40, 40
