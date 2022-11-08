@@ -224,7 +224,7 @@ def init(): #게임 초기화
     player.bow = 1
     displayx = -300
     displayy = -300
-    time_check = 5
+    time_check = 0
     prevx = 1
     prevy = 1
     
@@ -293,19 +293,19 @@ def respawn(): #몬스터 생성 구현
             spawny = r.sample(minusy + plusy,1)
             spawn_mob = r.sample(list(range(1,101)), 1)
             spawn_mob = spawn_mob[0]
-            if time_check < 1:
+            if time_check <= 1:
                 zombie_p = zombie(10,spawnx[0],spawny[0])
-            elif time_check < 3:
+            elif time_check <= 3:
                 if spawn_mob <= 20:
                     middle_slime_p = middle_slime(16,spawnx[0],spawny[0])
                 else:
                     zombie_p = zombie(10,spawnx[0],spawny[0])
-            elif time_check < 5:
+            elif time_check <= 5:
                 if spawn_mob <= 50:
                     middle_slime_p = middle_slime(16,spawnx[0],spawny[0])
                 else:
                     zombie_p = zombie(10,spawnx[0],spawny[0])
-            elif time_check < 8:
+            elif time_check <= 8:
                 if spawn_mob <= 10:
                     large_slime_p = large_slime(24,spawnx[0],spawny[0])
                 elif spawn_mob <= 80:
@@ -449,8 +449,11 @@ def start_the_game(): #게임 시작
                     inv = 1 #무적 상태가 됨
 
         display.blit(file.character, (player.x,player.y))
+        
         if sp:
-            display.blit(sp_display,(display_wide - 100,50))
+            display.blit(file.pick_window,(display_wide / 2 - 200 ,display_height - 50))
+            display.blit(file.Image_power,(display_wide / 2 - 120 ,display_height - 43))
+            display.blit(file.Image_attackSpeed,(display_wide / 2 - 20 ,display_height - 43))
         display.blit(time_display,(display_wide / 2 - 45,10))
         display.blit(level_display,(display_wide - 100,10))
         display.blit(exp_display,(display_wide - 250,10))
