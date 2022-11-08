@@ -29,3 +29,9 @@ class file:
         self.Image_attackSpeed = p.transform.scale(self.Image_attackSpeed, (40, 40))    # 원본 픽셀값: 40, 40
         self.Image_power = p.image.load(os.path.join(DIR_IMAGE, "power.png"))
         self.Image_power = p.transform.scale(self.Image_power, (40, 40))    # 원본 픽셀값: 40, 40
+        self.level_state = p.image.load(os.path.join(DIR_IMAGE, "level_state.png")) # 원본 픽셀값: 40, 40
+        self.level_state = p.transform.scale(self.level_state, (40, 40))
+        self.monster_hp = p.image.load(os.path.join(DIR_IMAGE, "monsterHp.png"))    # 원본 픽셀값: 100, 30
+        self.monster_hp = p.transform.scale(self.monster_hp, (100, 30))
+        self.monster_hp_layer = p.image.load(os.path.join(DIR_IMAGE, "monsterHpLayer.png")) # 원본 픽셀값: 100, 30
+        self.monster_hp_layer = p.transform.scale(self.monster_hp_layer, (100, 30))
