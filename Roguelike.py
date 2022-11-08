@@ -224,7 +224,7 @@ def init(): #게임 초기화
     player.bow = 1
     displayx = -300
     displayy = -300
-    time_check = 5
+    time_check = 0
     prevx = 1
     prevy = 1
     
@@ -450,7 +450,9 @@ def start_the_game(): #게임 시작
 
         display.blit(file.character, (player.x,player.y))
         if sp:
-            display.blit(sp_display,(display_wide - 100,50))
+            display.blit(file.pick_window,(display_wide / 2 - 200 ,display_height - 50))
+            display.blit(file.Image_power,(display_wide / 2 - 75 ,display_height - 43))
+            display.blit(file.Image_attackSpeed,(display_wide / 2 - 133 ,display_height - 43))
         display.blit(time_display,(display_wide / 2 - 45,10))
         display.blit(level_display,(display_wide - 100,10))
         display.blit(exp_display,(display_wide - 250,10))
